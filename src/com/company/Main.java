@@ -2,6 +2,7 @@ package com.company;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Period;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -18,14 +19,16 @@ public class Main {
         System.out.print(getMinPatient((patients)));
         System.out.print(getMaxPatient((patients)));
         System.out.println(getPatientFirstDecember((patients)));
-        System.out.print(hasAbsolutelyHealthy((patients)));
+        System.out.println(hasAbsolutelyHealthy((patients)));
+        System.out.println(hasOlder100YearsNone((patients)));
+        System.out.println(hasOlder100YearsAny((patients)));
     }
 
     // Преобразовать стрим из пациентов в Map, где "ключ" дата рождения, а значение - фио без преобразования
     public static Map<LocalDate, String> getMapWithPatient(List<Patient> list) {
         return list.stream()
                 .collect(Collectors.toMap(Patient::getBirthDate,
-                        Patient::getFio, (k1, k2) -> k1));
+                        Patient::getFio,  (k1, k2) -> k1));
     }
 
     public static Map<LocalDate, List<String>> getMap(List<Patient> list) {
@@ -64,5 +67,16 @@ public class Main {
     public static boolean hasAbsolutelyHealthy(List<Patient> list) {
         return !list.stream()
                 .allMatch(p -> p.getExpenses().size() > 0);
+    }
+
+    // Проверить. есть ли хоть один человек, старше 100 лет
+    public static boolean hasOlder100YearsNone(List<Patient> list) {
+        return !list.stream()
+                .noneMatch(p -> Period.between(p.getBirthDate(), LocalDate.now()).getYears()  > 100);
+    }
+
+    public static boolean hasOlder100YearsAny(List<Patient> list) {
+        return list.stream()
+                .anyMatch(p -> Period.between(p.getBirthDate(), LocalDate.now()).getYears() > 100);
     }
 }
